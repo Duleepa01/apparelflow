@@ -2,9 +2,14 @@ import fs from 'node:fs';
 import pg from 'pg';
 import bcrypt from 'bcryptjs';
 
+const url = process.argv.includes('--test')
+  ? process.env.TEST_DATABASE_URL
+  : process.env.DATABASE_URL;
+if (!url) throw new Error('Database URL is not set');
+const isLocal = /@(localhost|127\.0\.0\.1)[:/]/.test(url);
 const client = new pg.Client({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
+  connectionString: url,
+  ssl: isLocal ? false : { rejectUnauthorized: false },
 });
 await client.connect();
 await client.query(fs.readFileSync('db/schema.sql', 'utf8'));
