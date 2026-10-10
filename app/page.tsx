@@ -16,6 +16,12 @@ async function SessionInfo() {
           Cutting Orders
         </a>
       )}
+
+      {session.role === 'cutting_verifier' && (
+        <a href="/verify" className="mt-4 inline-block text-blue-800 underline">
+          Verification Terminal
+        </a>
+      )}
       <div>
         <LogoutButton />
       </div>
