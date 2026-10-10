@@ -11,7 +11,14 @@ async function SessionInfo() {
       <p className="mt-2">
         Signed in as {session.name} ({session.role})
       </p>
-      <LogoutButton />
+      {session.role === 'cutting_supervisor' && (
+        <a href="/orders" className="mt-4 inline-block text-blue-800 underline">
+          Cutting Orders
+        </a>
+      )}
+      <div>
+        <LogoutButton />
+      </div>
     </>
   );
 }
