@@ -173,7 +173,7 @@ export default function OrdersClient({ name }: { name: string }) {
               <select className={inputCls} value={form.recipeId} onChange={set('recipeId')}>
                 <option value="">Select a recipe…</option>
                 {recipes.map((r) => (
-                  <option key={r.id} value={r.id}>{r.recipe_code} — {r.name}</option>
+                  <option key={r.id} value={r.id}>{r.recipe_code} - {r.name}</option>
                 ))}
               </select>
               <FieldError msg={errors.recipe_id} />
