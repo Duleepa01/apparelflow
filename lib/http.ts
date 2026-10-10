@@ -13,3 +13,7 @@ export function errorResponse(e: unknown) {
   console.error(e);
   return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 }
+export function parseId(raw: string): number {
+  if (!/^\d{1,9}$/.test(raw)) throw new HttpError(400, 'Invalid id');
+  return Number(raw);
+}
