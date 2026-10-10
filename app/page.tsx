@@ -22,6 +22,12 @@ async function SessionInfo() {
           Verification Terminal
         </a>
       )}
+
+      {session.role === 'sewing_supervisor' && (
+        <a href="/sewing" className="mt-4 inline-block text-blue-800 underline">
+          Sewing Queue
+        </a>
+      )}
       <div>
         <LogoutButton />
       </div>
