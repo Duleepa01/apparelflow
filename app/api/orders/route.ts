@@ -7,9 +7,12 @@ import { checkInt, checkYards, checkRollId } from '@/lib/validation';
 export async function GET() {
   try {
     await requireRole('cutting_supervisor');
-    const { rows } = await pool.query(`
+        const { rows } = await pool.query(`
       SELECT o.id, o.order_no, o.status, o.target_qty, o.fabric_roll_id,
              o.actual_fabric_yds::float8 AS actual_fabric_yds, o.created_at,
+             (SELECT l.rejection_note FROM verification_logs l
+              WHERE l.order_id = o.id AND l.decision = 'REJECTED'
+              ORDER BY l.id DESC LIMIT 1) AS rejection_note,
              r.recipe_code, r.name AS recipe_name
       FROM cutting_orders o
       JOIN recipes r ON r.id = o.recipe_id
@@ -61,7 +64,7 @@ export async function POST(req: Request) {
          VALUES ($1,$2,$3,$4,$5,$6,'PENDING_VERIFICATION',$7)
          RETURNING id, order_no, status`,
         [id, orderNo, body.recipe_id, body.target_qty, body.fabric_roll_id.trim(),
-         body.actual_fabric_yds, session.userId]
+          body.actual_fabric_yds, session.userId]
       );
 
       await client.query(

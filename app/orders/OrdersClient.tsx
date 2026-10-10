@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+
 type Comp = { id: number; component_name: string; pieces_per_garment: number };
 type Recipe = {
   id: number; recipe_code: string; name: string;
@@ -11,7 +12,7 @@ type Recipe = {
 type Order = {
   id: number; order_no: string; status: string; target_qty: number;
   fabric_roll_id: string; actual_fabric_yds: number; created_at: string;
-  recipe_code: string; recipe_name: string;
+  recipe_code: string; recipe_name: string; rejection_note: string | null;
 };
 type Form = { recipeId: string; qty: string; roll: string; yards: string };
 
@@ -110,6 +111,16 @@ export default function OrdersClient({ name }: { name: string }) {
     setReload((n) => n + 1);
   }
 
+  async function resubmit(o: Order) {
+    setLoadError('');
+    const res = await fetch(`/api/orders/${o.id}/resubmit`, { method: 'POST' });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      setLoadError(d.error ?? 'Resubmit failed');
+    }
+    setReload((n) => n + 1);
+  }
+
   const recipe = recipes.find((r) => r.id === Number(form.recipeId));
   const qtyOk = /^\d+$/.test(form.qty) && Number(form.qty) >= 1;
   const set = (k: keyof Form) => (ev: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
@@ -139,14 +150,14 @@ export default function OrdersClient({ name }: { name: string }) {
         <table className="w-full text-left text-sm">
           <thead className="bg-gray-100">
             <tr>
-              {['Order', 'Recipe', 'Qty', 'Fabric roll', 'Yards used', 'Status', 'Created'].map((h) => (
+              {['Order', 'Recipe', 'Qty', 'Fabric roll', 'Yards used', 'Status', 'Created', 'Note / action'].map((h) => (
                 <th key={h} className="px-3 py-2 font-semibold">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {orders.length === 0 && (
-              <tr><td colSpan={7} className="px-3 py-4">No orders yet.</td></tr>
+              <tr><td colSpan={8} className="px-3 py-4">No orders yet.</td></tr>
             )}
             {orders.map((o) => (
               <tr key={o.id} className="border-t border-gray-300">
@@ -157,6 +168,19 @@ export default function OrdersClient({ name }: { name: string }) {
                 <td className="px-3 py-2">{o.actual_fabric_yds}</td>
                 <td className="px-3 py-2 font-medium">{o.status}</td>
                 <td className="px-3 py-2">{new Date(o.created_at).toLocaleString()}</td>
+                <td className="px-3 py-2">
+                  {o.status === 'REJECTED' && (
+                    <div>
+                      <p className="mb-1 font-medium text-red-900">Rejected: {o.rejection_note}</p>
+                      <button
+                        onClick={() => resubmit(o)}
+                        className="rounded border border-blue-800 px-3 py-1 text-sm font-medium text-blue-800"
+                      >
+                        Resubmit for verification
+                      </button>
+                    </div>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>

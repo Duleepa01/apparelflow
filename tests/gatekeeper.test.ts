@@ -7,6 +7,7 @@ import { POST as approve } from '@/app/api/verification/orders/[id]/approve/rout
 import { POST as reject } from '@/app/api/verification/orders/[id]/reject/route';
 import { GET as sewingQueueApi } from '@/app/api/sewing/queue/route';
 import { loginAs } from './session';
+import { POST as resubmit } from '@/app/api/orders/[id]/resubmit/route';
 
 const req = (method: string, body?: unknown) =>
   new Request('http://test.local/api', {
@@ -171,5 +172,39 @@ describe('Extra guards', () => {
   it('audit logs are immutable at the database level', async () => {
     await expect(pool.query('UPDATE verification_logs SET wastage_pct = 0')).rejects.toThrow(/immutable/);
     await expect(pool.query('DELETE FROM verification_logs')).rejects.toThrow(/immutable/);
+  });
+});
+
+describe('Rejected order flow', () => {
+  it('supervisor resubmits a rejected order: counts reset, history kept, approval blocked until recounted', async () => {
+    const id = await newOrder();
+    await countAll(id, 'short');
+    await loginAs('cutting_verifier');
+    expect((await reject(req('POST', { note: 'Cuffs short' }), ctx(id))).status).toBe(200);
+
+    await loginAs('cutting_supervisor');
+    expect((await resubmit(req('POST'), ctx(id))).status).toBe(200);
+    expect(await statusOf(id)).toBe('PENDING_VERIFICATION');
+    const { rows } = await pool.query(
+      'SELECT actual_qty, status FROM verification_items WHERE order_id = $1',
+      [id]
+    );
+    expect(rows.every((r) => r.actual_qty === null && r.status === null)).toBe(true);
+    expect(await logsOf(id)).toHaveLength(1);
+
+    await loginAs('cutting_verifier');
+    expect((await approve(req('POST'), ctx(id))).status).toBe(422);
+  });
+
+  it('only a supervisor can resubmit, and only REJECTED orders', async () => {
+    const id = await newOrder();
+    await loginAs('cutting_supervisor');
+    expect((await resubmit(req('POST'), ctx(id))).status).toBe(409);
+    for (const role of ['cutting_verifier', 'sewing_supervisor'] as const) {
+      await loginAs(role);
+      expect((await resubmit(req('POST'), ctx(id))).status).toBe(403);
+    }
+    await loginAs(null);
+    expect((await resubmit(req('POST'), ctx(id))).status).toBe(401);
   });
 });
