@@ -60,7 +60,7 @@ All rules live on the server. Disabled buttons, hidden links and redirects are o
 - **Immutable audit trail:** on approval the verifier id, timestamp, wastage % and a per-component variance snapshot are written to `verification_logs`. A database trigger rejects `UPDATE` and `DELETE` on that table.
 - **Database as a backstop:** `CHECK` constraints enforce positive quantities, valid statuses and roles, and a non-empty rejection note on `REJECTED` logs. Unique constraints stop duplicate items.
 - **Row-level security** is enabled on every table with no policies, which closes Supabase's auto-generated REST API. The app connects as the `postgres` role, which bypasses RLS.
-- **Strict input validation:** quantities must be whole numbers, yards positive with at most 2 decimals, and roll IDs match `[A-Za-z0-9_-]{1,50}`. Strings, decimals, negatives and empty payloads are rejected (`400` with per-field messages shown inline in the UI).
+- **Strict input validation:** quantities must be whole numbers, yards a whole number of 1 or more, and roll IDs match `[A-Za-z0-9_-]{1,50}`. Strings, decimals, negatives and empty payloads are rejected (`400` with per-field messages shown inline in the UI).
 - **Non-leaking responses:** starting sewing on a non-verified order returns `404`, so a sewing user cannot discover pending orders.
 
 ## Data model
@@ -85,7 +85,7 @@ Seeded recipes: **REC-BL01 Casual Blouse** (1.8 yds, 5% cap) and **REC-CT02 Crop
 5. **Start Sewing Assembly** moves an order to `SEWING_STARTED`, which removes it from the queue.
 6. **Rejected orders:** the supervisor sees the verifier's reason and can resubmit. Resubmit clears the old counts so the pieces must be recounted. The earlier `REJECTED` log row is kept.
 7. Fabric yards are not editable on resubmit.
-8. Quantities are whole numbers. Fabric yards accept up to 2 decimals because the wastage formula needs them.
+8. All quantities, including fabric yards, are whole numbers, following the brief’s rule that inputs reject decimals. Expected fabric and wastage % are still computed with decimals.
 
 ## Local setup
 

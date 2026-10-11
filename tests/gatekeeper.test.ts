@@ -41,8 +41,8 @@ async function countAll(orderId: number, mode: 'exact' | 'excess' | 'short') {
     component_id: r.component_id,
     actual_qty:
       mode === 'short' && i === rows.length - 1 ? r.expected_qty - 1
-      : mode === 'excess' && i === 0 ? r.expected_qty + 3
-      : r.expected_qty,
+        : mode === 'excess' && i === 0 ? r.expected_qty + 3
+          : r.expected_qty,
   }));
   await loginAs('cutting_verifier');
   expect((await saveCounts(req('PUT', { counts }), ctx(orderId))).status).toBe(200);
@@ -155,7 +155,7 @@ describe('Extra guards', () => {
     const ok = { recipe_id: blouseId, target_qty: 5, fabric_roll_id: 'R1', actual_fabric_yds: 9 };
     const bad = [
       { ...ok, target_qty: 2.5 }, { ...ok, target_qty: -1 }, { ...ok, target_qty: '5' },
-      { ...ok, actual_fabric_yds: 0 }, { ...ok, actual_fabric_yds: 1.234 },
+      { ...ok, actual_fabric_yds: 92.5 }, { ...ok, actual_fabric_yds: 1.234 },
       { ...ok, fabric_roll_id: '' }, {},
     ];
     for (const b of bad) expect((await createOrder(req('POST', b))).status).toBe(400);

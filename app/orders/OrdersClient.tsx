@@ -28,8 +28,8 @@ function validate(f: Form) {
     e.target_qty = 'Enter a whole number between 1 and 100000';
   if (!/^[A-Za-z0-9_-]{1,50}$/.test(f.roll.trim()))
     e.fabric_roll_id = 'Use letters, digits, - or _ (max 50 characters)';
-  if (!/^\d+(\.\d{1,2})?$/.test(f.yards) || Number(f.yards) <= 0 || Number(f.yards) > 1000000)
-    e.actual_fabric_yds = 'Enter a positive number, max 2 decimals';
+  if (!/^\d+$/.test(f.yards) || Number(f.yards) < 1 || Number(f.yards) > 1000000)
+    e.actual_fabric_yds = 'Enter a whole number of yards (1 or more)';
   return e;
 }
 
@@ -244,7 +244,7 @@ export default function OrdersClient({ name }: { name: string }) {
 
             <label className="block text-sm font-medium">
               Actual fabric used (yards)
-              <input className={inputCls} inputMode="decimal" placeholder="e.g. 92.5" value={form.yards} onChange={set('yards')} />
+              <input className={inputCls} inputMode="decimal" placeholder="e.g. 92" value={form.yards} onChange={set('yards')} />
               <FieldError msg={errors.actual_fabric_yds} />
             </label>
 

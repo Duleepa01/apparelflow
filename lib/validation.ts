@@ -6,18 +6,8 @@ export function checkInt(v: unknown, min: number, max: number): string | null {
 }
 
 export function checkYards(v: unknown, max: number): string | null {
-  if (
-    typeof v !== 'number' ||
-    !Number.isFinite(v) ||
-    v <= 0 ||
-    v > max ||
-    Math.round(v * 100) / 100 !== v
-  ) {
-    return `Must be a positive number (max 2 decimals, up to ${max})`;
-  }
-  return null;
+  return checkInt(v, 1, max) ? `Must be a whole number between 1 and ${max}` : null;
 }
-
 export function checkRollId(v: unknown): string | null {
   if (typeof v !== 'string' || !/^[A-Za-z0-9_-]{1,50}$/.test(v.trim())) {
     return 'Use letters, digits, - or _ (max 50 characters)';
