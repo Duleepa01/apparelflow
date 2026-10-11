@@ -18,7 +18,7 @@ export default function PageShell({
   return (
     <div className="min-h-screen">
       <header className="border-b-4 border-orange-700 bg-slate-900 text-white">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-6 py-3">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3 sm:px-6">
           <Link href="/" className="flex items-center gap-3 no-underline hover:no-underline">
             <span aria-hidden className="flex h-9 w-9 items-center justify-center bg-orange-700 font-mono text-sm font-bold">
               AF
@@ -37,7 +37,7 @@ export default function PageShell({
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-6 py-8 text-slate-900">
+      <main className="mx-auto max-w-6xl px-4 py-6 text-slate-900 sm:px-6 sm:py-8">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold">{title}</h1>

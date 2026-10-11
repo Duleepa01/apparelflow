@@ -127,7 +127,7 @@ export default function OrdersClient({ name }: { name: string }) {
   const set = (k: keyof Form) => (ev: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: ev.target.value }));
 
-    return (
+  return (
     <PageShell
       name={name}
       role="cutting_supervisor"
@@ -146,8 +146,34 @@ export default function OrdersClient({ name }: { name: string }) {
           {loadError}
         </p>
       )}
-
-      <div className="card overflow-x-auto">
+      <ul className="space-y-3 md:hidden">
+        {orders.length === 0 && <li className="card p-4 text-sm">No orders yet.</li>}
+        {orders.map((o) => (
+          <li key={o.id} className="card p-3">
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-mono font-semibold">{o.order_no}</span>
+              <StatusBadge status={o.status} />
+            </div>
+            <p className="mt-1 text-sm">{o.recipe_code} · {o.recipe_name}</p>
+            <p className="text-sm text-slate-700">
+              Qty {o.target_qty} · {o.fabric_roll_id} · {o.actual_fabric_yds} yds
+            </p>
+            <p className="text-xs text-slate-700">{new Date(o.created_at).toLocaleString()}</p>
+            {o.status === 'REJECTED' && (
+              <div className="mt-2 border-t border-slate-300 pt-2">
+                <p className="mb-2 text-sm font-medium text-red-900">Rejected: {o.rejection_note}</p>
+                <button
+                  onClick={() => resubmit(o)}
+                  className="rounded border border-blue-800 px-3 py-1.5 text-sm font-medium text-blue-800"
+                >
+                  Resubmit for verification
+                </button>
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+      <div className="card hidden overflow-x-auto md:block">
         <table className="w-full text-left text-sm">
           <thead className="bg-slate-100">
             <tr>

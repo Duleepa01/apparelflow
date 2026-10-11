@@ -148,7 +148,7 @@ export default function VerifyClient({ name }: { name: string }) {
       )}
 
       <div className="grid gap-6 md:grid-cols-3">
-        <section>
+        <section className="min-w-0">
           <h2 className="mb-2 font-semibold">Pending verification ({orders.length})</h2>
           <ul className="space-y-2">
             {orders.length === 0 && <li className="card p-3 text-sm">No orders waiting.</li>}
@@ -156,7 +156,7 @@ export default function VerifyClient({ name }: { name: string }) {
               <li key={o.id}>
                 <button
                   onClick={() => open(o.id)}
-                 aria-pressed={detail?.id === o.id}
+                  aria-pressed={detail?.id === o.id}
                   className="card pick w-full p-3 text-left"
                 >
                   <strong className="font-mono">{o.order_no}</strong>
@@ -170,10 +170,10 @@ export default function VerifyClient({ name }: { name: string }) {
           </ul>
         </section>
 
-        <section className="md:col-span-2">
+        <section className="min-w-0 md:col-span-2">
           {!detail && <p className="card p-4 text-sm">Select an order to start counting.</p>}
           {detail && (
-            <div className="card space-y-4 p-4">
+            <div className="card space-y-4 p-3 sm:p-4">
               <div>
                 <h2 className="text-lg font-bold">{detail.order_no} · {detail.recipe_name}</h2>
                 <p className="text-sm">
@@ -193,15 +193,20 @@ export default function VerifyClient({ name }: { name: string }) {
                       <th className="px-2 py-2">Component</th>
                       <th className="px-2 py-2">Expected</th>
                       <th className="px-2 py-2">Counted</th>
-                      <th className="px-2 py-2">Status</th>
+                      <th className="hidden px-2 py-2 md:table-cell">Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     {detail.items.map((i, idx) => {
                       const raw = inputs[i.component_id] ?? '';
                       const f = flags[idx];
+                      const badge = f ? (
+                        <span className={`whitespace-nowrap rounded-full border px-2 py-1 text-xs font-semibold ${BADGE[f]}`}>{LABEL[f]}</span>
+                      ) : (
+                        <span className="text-xs">Not counted</span>
+                      );
                       return (
-                        <tr key={i.component_id} className="border-t border-slate-300">
+                        <tr key={i.component_id} className="border-t border-slate-300 align-top">
                           <td className="px-2 py-2">{i.component_name}</td>
                           <td className="px-2 py-2 font-medium">{i.expected_qty}</td>
                           <td className="px-2 py-2">
@@ -216,14 +221,9 @@ export default function VerifyClient({ name }: { name: string }) {
                             {raw !== '' && !f && (
                               <p role="alert" className="text-xs font-medium text-red-700">Whole number ≥ 0</p>
                             )}
+                            <div className="mt-1 md:hidden">{badge}</div>
                           </td>
-                          <td className="px-2 py-2">
-                            {f ? (
-                              <span className={`rounded-full border px-2 py-1 text-xs font-semibold ${BADGE[f]}`}>{LABEL[f]}</span>
-                            ) : (
-                              <span className="text-xs">Not counted</span>
-                            )}
-                          </td>
+                          <td className="hidden px-2 py-2 md:table-cell">{badge}</td>
                         </tr>
                       );
                     })}

@@ -99,29 +99,42 @@ export default function SewingClient({ name }: { name: string }) {
             </div>
 
             {openId === o.id && (
-              <div className="mt-3 overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead className="bg-slate-100">
-                    <tr>
-                      <th className="px-2 py-2">Component</th>
-                      <th className="px-2 py-2">Expected</th>
-                      <th className="px-2 py-2">Counted</th>
-                      <th className="px-2 py-2">Variance</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {o.variances.map((v) => (
-                      <tr key={v.component_name} className="border-t border-slate-300">
-                        <td className="px-2 py-2">{v.component_name}</td>
-                        <td className="px-2 py-2">{v.expected}</td>
-                        <td className="px-2 py-2">{v.actual}</td>
-                        <td className="px-2 py-2 font-medium">
-                          {v.variance === 0 ? 'Match' : `Excess +${v.variance}`}
-                        </td>
+              <div className="mt-3">
+                <ul className="divide-y divide-slate-300 border-t border-slate-300 sm:hidden">
+                  {o.variances.map((v) => (
+                    <li key={v.component_name} className="py-2 text-sm">
+                      <p className="font-medium">{v.component_name}</p>
+                      <p className="text-slate-700">
+                        Expected {v.expected} · Counted {v.actual} ·{' '}
+                        <strong>{v.variance === 0 ? 'Match' : `Excess +${v.variance}`}</strong>
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+                <div className="hidden overflow-x-auto sm:block">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-slate-100">
+                      <tr>
+                        <th className="px-2 py-2">Component</th>
+                        <th className="px-2 py-2">Expected</th>
+                        <th className="px-2 py-2">Counted</th>
+                        <th className="px-2 py-2">Variance</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {o.variances.map((v) => (
+                        <tr key={v.component_name} className="border-t border-slate-300">
+                          <td className="px-2 py-2">{v.component_name}</td>
+                          <td className="px-2 py-2">{v.expected}</td>
+                          <td className="px-2 py-2">{v.actual}</td>
+                          <td className="px-2 py-2 font-medium">
+                            {v.variance === 0 ? 'Match' : `Excess +${v.variance}`}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </li>
