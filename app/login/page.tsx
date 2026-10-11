@@ -1,13 +1,8 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { DEMO, DEMO_PASSWORD } from '@/lib/demo';
 
-const DEMO_PASSWORD = 'Demo@1234';
-const DEMO = [
-  { label: 'Cutting Supervisor', email: 'supervisor@apparelflow.demo' },
-  { label: 'Cutting Verifier', email: 'verifier@apparelflow.demo' },
-  { label: 'Sewing Supervisor', email: 'sewing@apparelflow.demo' },
-];
 
 export default function LoginPage() {
   const router = useRouter();
@@ -38,8 +33,9 @@ export default function LoginPage() {
     'w-full rounded border border-gray-500 bg-white px-3 py-2 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-700';
 
   return (
-    <main className="mx-auto max-w-md p-6">
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">ApparelFlow ERP</h1>
+    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center p-6">
+      <h1 className="text-3xl font-bold text-slate-900">ApparelFlow</h1>
+      <p className="mb-6 text-sm text-slate-700">Cutting verification and sewing queue gate</p>
 
       <form
         onSubmit={(ev) => {
@@ -81,7 +77,7 @@ export default function LoginPage() {
         </button>
       </form>
 
-      <section className="mt-6 rounded border border-gray-300 p-4">
+      <section className="mt-6 card p-5">
         <h2 className="mb-2 font-semibold text-gray-900">Demo credentials (password: {DEMO_PASSWORD})</h2>
         <ul className="space-y-2">
           {DEMO.map((d) => (

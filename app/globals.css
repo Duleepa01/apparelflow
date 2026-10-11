@@ -1,22 +1,147 @@
 @import "tailwindcss";
 
+@theme inline {
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, Consolas, monospace;
+}
+
+/* Brand palette remap: blue-* utilities render as brand rust; slate/gray render as warm stone. */
+@theme {
+  --color-blue-50: #fdf1ea;
+  --color-blue-100: #f9dccb;
+  --color-blue-600: #c2410c;
+  --color-blue-700: #b23c0f;
+  --color-blue-800: #a63d17;
+  --color-blue-900: #7f2d10;
+
+  --color-slate-50: #faf8f4;
+  --color-slate-100: #f0ece4;
+  --color-slate-200: #e2dcd0;
+  --color-slate-300: #cfc7b8;
+  --color-slate-400: #a39a8b;
+  --color-slate-500: #78716c;
+  --color-slate-600: #57534e;
+  --color-slate-700: #44403c;
+  --color-slate-800: #292524;
+  --color-slate-900: #1c1917;
+
+  --color-gray-50: #faf8f4;
+  --color-gray-100: #f0ece4;
+  --color-gray-200: #e2dcd0;
+  --color-gray-300: #cfc7b8;
+  --color-gray-400: #a39a8b;
+  --color-gray-500: #78716c;
+  --color-gray-600: #57534e;
+  --color-gray-700: #44403c;
+  --color-gray-800: #292524;
+  --color-gray-900: #1c1917;
+}
+
 :root {
   color-scheme: light;
 }
 
 body {
-  background: #ffffff;
-  color: #111827;
+  background: #f4f0e8;
+  color: #1c1917;
 }
 
 input,
 select,
 textarea {
   background-color: #ffffff;
-  color: #111827;
+  color: #1c1917;
 }
 
 select option {
   background-color: #ffffff;
-  color: #111827;
+  color: #1c1917;
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.01em;
+}
+
+thead th {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #44403c;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #cfc7b8;
+  border-radius: 2px;
+  box-shadow: 0 1px 0 rgba(28, 25, 23, 0.05);
+}
+
+/* Focus */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #a63d17;
+  outline-offset: 2px;
+}
+
+/* Pointer + hover feedback */
+button:not(:disabled),
+select,
+a[href] {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+button[aria-pressed="true"]:not(.pick) {
+  cursor: default;
+}
+
+button,
+a,
+input,
+select,
+textarea,
+.card,
+tbody tr {
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s, filter 0.15s;
+}
+
+button:not(:disabled):hover {
+  filter: brightness(0.92);
+}
+button:not(:disabled):active {
+  transform: translateY(1px);
+}
+button.border-blue-800:not(:disabled):hover {
+  background-color: #fdf1ea;
+  filter: none;
+}
+a[href]:hover {
+  text-decoration: underline;
+}
+input:not(:disabled):hover,
+select:hover,
+textarea:hover {
+  border-color: #a63d17;
+}
+tbody tr:hover {
+  background-color: #faf8f4;
+}
+
+/* Selectable list items (e.g. orders in the verifier terminal) */
+.pick:not(:disabled):hover {
+  filter: none;
+  border-color: #a63d17;
+  background-color: #fdf1ea;
+  box-shadow: inset 4px 0 0 #a63d17;
+}
+.pick[aria-pressed="true"] {
+  border-color: #a63d17;
+  background-color: #f9dccb;
+  box-shadow: inset 4px 0 0 #a63d17;
 }

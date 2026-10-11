@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import PageShell from '@/components/PageShell';
+import StatusBadge from '@/components/StatusBadge';
 
 
 type Comp = { id: number; component_name: string; pieces_per_garment: number };
@@ -126,29 +127,29 @@ export default function OrdersClient({ name }: { name: string }) {
   const set = (k: keyof Form) => (ev: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: ev.target.value }));
 
-  return (
-    <main className="mx-auto max-w-5xl p-6 text-gray-900">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Cutting Orders</h1>
-          <p className="text-sm">
-            {name} (Cutting Supervisor) ·{' '}
-            <Link className="text-blue-800 underline" href="/">Home</Link>
-          </p>
-        </div>
+    return (
+    <PageShell
+      name={name}
+      role="cutting_supervisor"
+      title="Cutting Orders"
+      actions={
         <button
           onClick={() => { setErrors({}); setSubmitError(''); setOpen(true); }}
           className="rounded bg-blue-800 px-4 py-2 font-medium text-white"
         >
           New Cutting Order
         </button>
-      </div>
+      }
+    >
+      {loadError && (
+        <p role="alert" className="mb-4 rounded border border-red-800 bg-red-100 p-3 font-medium text-red-900">
+          {loadError}
+        </p>
+      )}
 
-      {loadError && <p role="alert" className="mb-4 font-medium text-red-700">{loadError}</p>}
-
-      <div className="overflow-x-auto rounded border border-gray-300">
+      <div className="card overflow-x-auto">
         <table className="w-full text-left text-sm">
-          <thead className="bg-gray-100">
+          <thead className="bg-slate-100">
             <tr>
               {['Order', 'Recipe', 'Qty', 'Fabric roll', 'Yards used', 'Status', 'Created', 'Note / action'].map((h) => (
                 <th key={h} className="px-3 py-2 font-semibold">{h}</th>
@@ -160,13 +161,13 @@ export default function OrdersClient({ name }: { name: string }) {
               <tr><td colSpan={8} className="px-3 py-4">No orders yet.</td></tr>
             )}
             {orders.map((o) => (
-              <tr key={o.id} className="border-t border-gray-300">
-                <td className="px-3 py-2 font-medium">{o.order_no}</td>
+              <tr key={o.id} className="border-t border-slate-300">
+                <td className="px-3 py-2 font-mono font-medium">{o.order_no}</td>
                 <td className="px-3 py-2">{o.recipe_code} · {o.recipe_name}</td>
                 <td className="px-3 py-2">{o.target_qty}</td>
                 <td className="px-3 py-2">{o.fabric_roll_id}</td>
                 <td className="px-3 py-2">{o.actual_fabric_yds}</td>
-                <td className="px-3 py-2 font-medium">{o.status}</td>
+                <td className="px-3 py-2"><StatusBadge status={o.status} /></td>
                 <td className="px-3 py-2">{new Date(o.created_at).toLocaleString()}</td>
                 <td className="px-3 py-2">
                   {o.status === 'REJECTED' && (
@@ -188,8 +189,8 @@ export default function OrdersClient({ name }: { name: string }) {
       </div>
 
       {open && (
-        <div className="fixed inset-0 z-10 flex items-start justify-center overflow-y-auto bg-black/60 p-4">
-          <form onSubmit={submit} noValidate className="my-8 w-full max-w-lg space-y-3 rounded bg-white p-5 text-gray-900">
+        <div className="fixed inset-0 z-20 flex items-start justify-center overflow-y-auto bg-black/60 p-4">
+          <form onSubmit={submit} noValidate className="card my-8 w-full max-w-lg space-y-3 p-5 text-slate-900">
             <h2 className="text-xl font-bold">New Cutting Order</h2>
 
             <label className="block text-sm font-medium">
@@ -222,7 +223,7 @@ export default function OrdersClient({ name }: { name: string }) {
             </label>
 
             {recipe && qtyOk && (
-              <div className="rounded border border-gray-400 p-3 text-sm">
+              <div className="rounded border border-slate-400 bg-slate-50 p-3 text-sm">
                 <p className="mb-1 font-semibold">Expected component counts</p>
                 <ul>
                   {recipe.components.map((c) => (
@@ -240,7 +241,7 @@ export default function OrdersClient({ name }: { name: string }) {
             {submitError && <p role="alert" className="font-medium text-red-700">{submitError}</p>}
 
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setOpen(false)} className="rounded border border-gray-700 px-4 py-2">
+              <button type="button" onClick={() => setOpen(false)} className="rounded border border-slate-700 px-4 py-2 font-medium text-slate-900">
                 Cancel
               </button>
               <button disabled={saving} className="rounded bg-blue-800 px-4 py-2 font-medium text-white disabled:opacity-60">
@@ -250,6 +251,6 @@ export default function OrdersClient({ name }: { name: string }) {
           </form>
         </div>
       )}
-    </main>
+    </PageShell>
   );
 }

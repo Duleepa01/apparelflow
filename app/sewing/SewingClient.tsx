@@ -1,7 +1,8 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import PageShell from '@/components/PageShell';
+import StatusBadge from '@/components/StatusBadge';
 
 type Variance = { component_name: string; expected: number; actual: number; variance: number };
 type QueueOrder = {
@@ -52,27 +53,27 @@ export default function SewingClient({ name }: { name: string }) {
   }
 
   return (
-    <main className="mx-auto max-w-5xl p-6 text-gray-900">
-      <h1 className="text-2xl font-bold">Sewing Queue</h1>
-      <p className="mb-6 text-sm">
-        {name} (Sewing Supervisor) · <Link className="text-blue-800 underline" href="/">Home</Link>
-      </p>
-
+    <PageShell name={name} role="sewing_supervisor" title="Sewing Queue">
       {msg && (
         <p role="alert" className={`mb-4 rounded border p-3 font-medium ${msg.ok ? 'border-green-800 bg-green-100 text-green-900' : 'border-red-800 bg-red-100 text-red-900'}`}>
           {msg.text}
         </p>
       )}
 
-      {orders.length === 0 && <p>No verified batches waiting.</p>}
+      {orders.length === 0 && (
+        <p className="card p-4 text-sm">No verified batches waiting.</p>
+      )}
 
       <ul className="space-y-4">
         {orders.map((o) => (
-          <li key={o.id} className="rounded border border-gray-400 p-4">
+          <li key={o.id} className="card p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h2 className="text-lg font-bold">{o.order_no} · {o.recipe_name} ({o.recipe_code})</h2>
-                <p className="text-sm">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="text-lg font-bold">{o.order_no} · {o.recipe_name} ({o.recipe_code})</h2>
+                  <StatusBadge status="VERIFIED" />
+                </div>
+                <p className="mt-1 text-sm">
                   Batch {o.target_qty} · Roll {o.fabric_roll_id} · Fabric used {o.actual_fabric_yds} yds · Wastage{' '}
                   <strong>{o.wastage_pct}%</strong>
                 </p>
@@ -80,7 +81,7 @@ export default function SewingClient({ name }: { name: string }) {
                   Verified by <strong>{o.verified_by}</strong> on {new Date(o.decided_at).toLocaleString()}
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setOpenId(openId === o.id ? null : o.id)}
                   className="rounded border border-blue-800 px-3 py-2 text-sm font-medium text-blue-800"
@@ -98,32 +99,34 @@ export default function SewingClient({ name }: { name: string }) {
             </div>
 
             {openId === o.id && (
-              <table className="mt-3 w-full text-left text-sm">
-                <thead className="bg-gray-100">
-                  <tr>
-                    <th className="px-2 py-2">Component</th>
-                    <th className="px-2 py-2">Expected</th>
-                    <th className="px-2 py-2">Counted</th>
-                    <th className="px-2 py-2">Variance</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {o.variances.map((v) => (
-                    <tr key={v.component_name} className="border-t border-gray-300">
-                      <td className="px-2 py-2">{v.component_name}</td>
-                      <td className="px-2 py-2">{v.expected}</td>
-                      <td className="px-2 py-2">{v.actual}</td>
-                      <td className="px-2 py-2 font-medium">
-                        {v.variance === 0 ? 'Match' : `Excess +${v.variance}`}
-                      </td>
+              <div className="mt-3 overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-slate-100">
+                    <tr>
+                      <th className="px-2 py-2">Component</th>
+                      <th className="px-2 py-2">Expected</th>
+                      <th className="px-2 py-2">Counted</th>
+                      <th className="px-2 py-2">Variance</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {o.variances.map((v) => (
+                      <tr key={v.component_name} className="border-t border-slate-300">
+                        <td className="px-2 py-2">{v.component_name}</td>
+                        <td className="px-2 py-2">{v.expected}</td>
+                        <td className="px-2 py-2">{v.actual}</td>
+                        <td className="px-2 py-2 font-medium">
+                          {v.variance === 0 ? 'Match' : `Excess +${v.variance}`}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </li>
         ))}
       </ul>
-    </main>
+    </PageShell>
   );
 }

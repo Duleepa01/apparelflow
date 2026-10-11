@@ -1,7 +1,7 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import PageShell from '@/components/PageShell';
 
 type Pending = {
   id: number; order_no: string; target_qty: number;
@@ -46,7 +46,7 @@ export default function VerifyClient({ name }: { name: string }) {
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
-   const fetchPending = useCallback(async (): Promise<Pending[] | null> => {
+  const fetchPending = useCallback(async (): Promise<Pending[] | null> => {
     const r = await fetch('/api/verification/orders');
     if (r.status === 401) {
       router.push('/login');
@@ -140,12 +140,7 @@ export default function VerifyClient({ name }: { name: string }) {
   const wastage = detail ? ((detail.actual_fabric_yds - expectedFabric) / expectedFabric) * 100 : 0;
 
   return (
-    <main className="mx-auto max-w-6xl p-6 text-gray-900">
-      <h1 className="text-2xl font-bold">Verification Terminal</h1>
-      <p className="mb-6 text-sm">
-        {name} (Cutting Verifier) · <Link className="text-blue-800 underline" href="/">Home</Link>
-      </p>
-
+    <PageShell name={name} role="cutting_verifier" title="Verification Terminal">
       {msg && (
         <p role="alert" className={`mb-4 rounded border p-3 font-medium ${msg.ok ? 'border-green-800 bg-green-100 text-green-900' : 'border-red-800 bg-red-100 text-red-900'}`}>
           {msg.text}
@@ -156,14 +151,15 @@ export default function VerifyClient({ name }: { name: string }) {
         <section>
           <h2 className="mb-2 font-semibold">Pending verification ({orders.length})</h2>
           <ul className="space-y-2">
-            {orders.length === 0 && <li className="text-sm">No orders waiting.</li>}
+            {orders.length === 0 && <li className="card p-3 text-sm">No orders waiting.</li>}
             {orders.map((o) => (
               <li key={o.id}>
                 <button
                   onClick={() => open(o.id)}
-                  className={`w-full rounded border p-3 text-left ${detail?.id === o.id ? 'border-blue-800 bg-blue-50' : 'border-gray-400 bg-white'}`}
+                 aria-pressed={detail?.id === o.id}
+                  className="card pick w-full p-3 text-left"
                 >
-                  <strong>{o.order_no}</strong>
+                  <strong className="font-mono">{o.order_no}</strong>
                   <br />
                   <span className="text-sm">{o.recipe_code} · {o.recipe_name}</span>
                   <br />
@@ -175,9 +171,9 @@ export default function VerifyClient({ name }: { name: string }) {
         </section>
 
         <section className="md:col-span-2">
-          {!detail && <p className="text-sm">Select an order to start counting.</p>}
+          {!detail && <p className="card p-4 text-sm">Select an order to start counting.</p>}
           {detail && (
-            <div className="space-y-4 rounded border border-gray-400 p-4">
+            <div className="card space-y-4 p-4">
               <div>
                 <h2 className="text-lg font-bold">{detail.order_no} · {detail.recipe_name}</h2>
                 <p className="text-sm">
@@ -192,7 +188,7 @@ export default function VerifyClient({ name }: { name: string }) {
 
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-gray-100">
+                  <thead className="bg-slate-100">
                     <tr>
                       <th className="px-2 py-2">Component</th>
                       <th className="px-2 py-2">Expected</th>
@@ -205,7 +201,7 @@ export default function VerifyClient({ name }: { name: string }) {
                       const raw = inputs[i.component_id] ?? '';
                       const f = flags[idx];
                       return (
-                        <tr key={i.component_id} className="border-t border-gray-300">
+                        <tr key={i.component_id} className="border-t border-slate-300">
                           <td className="px-2 py-2">{i.component_name}</td>
                           <td className="px-2 py-2 font-medium">{i.expected_qty}</td>
                           <td className="px-2 py-2">
@@ -223,7 +219,7 @@ export default function VerifyClient({ name }: { name: string }) {
                           </td>
                           <td className="px-2 py-2">
                             {f ? (
-                              <span className={`rounded border px-2 py-1 text-xs font-semibold ${BADGE[f]}`}>{LABEL[f]}</span>
+                              <span className={`rounded-full border px-2 py-1 text-xs font-semibold ${BADGE[f]}`}>{LABEL[f]}</span>
                             ) : (
                               <span className="text-xs">Not counted</span>
                             )}
@@ -236,7 +232,7 @@ export default function VerifyClient({ name }: { name: string }) {
               </div>
 
               {!canApprove && !busy && (
-                <p className="text-sm font-medium">
+                <p className="rounded border border-slate-400 bg-slate-50 p-3 text-sm font-medium">
                   {anyRed
                     ? 'Approve blocked: at least one component has a shortage. Reject the batch instead.'
                     : 'Approve unavailable until every component is counted.'}
@@ -251,7 +247,7 @@ export default function VerifyClient({ name }: { name: string }) {
                 Approve Batch
               </button>
 
-              <div className="border-t border-gray-300 pt-4">
+              <div className="border-t border-slate-300 pt-4">
                 <label className="block text-sm font-medium">
                   Rejection reason (required to reject)
                   <textarea
@@ -276,6 +272,6 @@ export default function VerifyClient({ name }: { name: string }) {
           )}
         </section>
       </div>
-    </main>
+    </PageShell>
   );
 }
